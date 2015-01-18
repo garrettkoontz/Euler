@@ -1,14 +1,16 @@
 (ns euler3
-  (:require [clojure.math.numeric-tower :refer [sqrt] :as math] :reload))
-
-(defn primefactors
-  [a]
-  (primefactors a 2)
-  [a n]
-  (if (< n 2) (primefactors a)
-      (take 1 (filter #(= 0 (mod a %)) (range ()))))
-  )
+  (:require (clojure.math [numeric-tower :as math])))
 
 (defn prime?
   [a]
-  (empty? (filter #(mod a %) (range (math/sqrt a)))))
+  (empty? (filter #(zero? (mod a %)) (range 2 (math/sqrt (+ 1 a))))))
+
+(def primes (cons 2 (lazy-seq (filter prime? (iterate (partial + 2) 3)))))
+
+(defn primefactors
+  [a]
+  (filter #(zero? (mod a %)) (take-while #(>= (math/sqrt a) %) primes)))
+
+(defn max-prime-factor
+  [n]
+  (apply max (primefactors n)))
